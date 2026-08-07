@@ -2,778 +2,620 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Waypoint — Day Planner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dayline — Plan your day</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#11141c;
-    --panel:#1a1f2b;
-    --panel-2:#20273494;
-    --rail:#333c4d;
-    --cream:#eee9de;
-    --dim:#98a0b3;
-    --gold:#e3b23c;
-    --teal:#4fb8a9;
-    --coral:#e2725b;
-    --lilac:#9a8fd6;
-    --danger:#e2725b;
-    --radius:10px;
-    font-size:16px;
+    --ink:#14181C;
+    --ink-soft:#1E252B;
+    --paper:#FBF8F1;
+    --paper-line:#E4DFD2;
+    --text-on-dark:#F4F1E8;
+    --text-on-dark-dim:#9AA3A8;
+    --text-on-paper:#1E2328;
+    --text-on-paper-dim:#6B6357;
+    --accent:#2955A3;
+    --accent-dim:#7C93B8;
+    --walk:#C98A2E;
+    --drive:#3E6EA8;
+    --train:#3F7D5C;
+    --bus:#8B4F8C;
+    --none:#8A8377;
+    --danger:#B4432F;
+    --radius:14px;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
-    background:var(--bg);
-    color:var(--cream);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    -webkit-font-smoothing:antialiased;
+    background:var(--ink);
+    color:var(--text-on-dark);
+    font-family:'Inter',sans-serif;
     min-height:100vh;
+    padding-bottom:60px;
   }
-  .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-variant-numeric:tabular-nums;}
-  .display{font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif; font-style:italic;}
+  .wrap{max-width:640px;margin:0 auto;padding:28px 18px 0;}
 
-  /* ===== Top bar ===== */
-  header.app{
-    position:sticky; top:0; z-index:20;
-    background:linear-gradient(180deg,#11141c 80%,transparent);
-    padding:14px 16px 6px;
-    display:flex; align-items:center; justify-content:space-between;
+  /* ---------- Header ---------- */
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent-dim);
+    margin:0 0 6px;
   }
-  header.app .brand{
-    display:flex; align-items:baseline; gap:8px;
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:34px;
+    line-height:1.05;
+    margin:0 0 8px;
+    letter-spacing:-.01em;
   }
-  header.app .brand .mark{
-    width:10px;height:10px;border-radius:50%;
-    background:var(--gold); box-shadow:0 0 10px var(--gold);
-  }
-  header.app h1{
-    font-size:1.3rem; margin:0; font-weight:400; letter-spacing:.02em;
-  }
-  header.app .trip-switch{
-    background:none;border:1px solid var(--rail); color:var(--dim);
-    border-radius:20px; padding:6px 12px; font-size:.8rem; cursor:pointer;
-  }
-  header.app .trip-switch:active{background:var(--panel);}
+  h1 span{color:var(--accent-dim);}
+  .sub{color:var(--text-on-dark-dim);font-size:14.5px;line-height:1.5;margin:0;max-width:46ch;}
 
-  main{max-width:640px; margin:0 auto; padding:0 12px 90px;}
+  /* ---------- Section shells ---------- */
+  section{margin-bottom:26px;}
+  .section-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--text-on-dark-dim);
+    margin:0 0 10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-label::after{content:"";flex:1;height:1px;background:#2A3138;}
 
-  /* ===== Trip list screen ===== */
-  .trip-card{
-    background:var(--panel); border-radius:var(--radius);
-    padding:16px 18px; margin-bottom:12px; cursor:pointer;
-    border:1px solid #262c3a;
-    transition:border-color .15s;
+  /* ---------- Time control card ---------- */
+  .time-card{
+    background:var(--ink-soft);
+    border:1px solid #262D34;
+    border-radius:var(--radius);
+    padding:16px;
   }
-  .trip-card:active{border-color:var(--gold);}
-  .trip-card h3{margin:0 0 4px; font-family:Georgia,serif; font-style:italic; font-weight:400; font-size:1.15rem;}
-  .trip-card .meta{color:var(--dim); font-size:.82rem;}
-  .empty-state{
-    text-align:center; padding:60px 20px; color:var(--dim);
+  .time-toggle{display:flex;gap:8px;margin-bottom:12px;}
+  .time-toggle button{
+    flex:1;
+    padding:9px;
+    border-radius:9px;
+    border:1px solid #2A3138;
+    background:transparent;
+    color:var(--text-on-dark-dim);
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
   }
-  .empty-state .glyph{font-size:2.2rem; margin-bottom:10px;}
-  .btn-primary{
-    display:inline-block; background:var(--gold); color:#1a1206;
-    border:none; border-radius:24px; padding:12px 22px;
-    font-size:.95rem; font-weight:600; cursor:pointer;
+  .time-toggle button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
   }
-  .btn-primary:active{transform:scale(.98);}
-  .btn-ghost{
-    background:none; border:1px solid var(--rail); color:var(--cream);
-    border-radius:24px; padding:11px 20px; font-size:.9rem; cursor:pointer;
+  .time-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .time-row label{font-size:13px;color:var(--text-on-dark-dim);}
+  .time-row input[type=time]{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:16px;
+    background:var(--ink);
+    border:1px solid #2A3138;
+    color:var(--text-on-dark);
+    border-radius:8px;
+    padding:7px 10px;
   }
-  .fab-new{
-    width:100%; margin-top:6px; padding:14px; border-radius:var(--radius);
-    background:var(--panel-2); border:1px dashed var(--rail); color:var(--dim);
-    font-size:.9rem; cursor:pointer;
+  .start-point-name{
+    flex:1;
+    min-width:140px;
+    background:var(--ink);
+    border:1px solid #2A3138;
+    color:var(--text-on-dark);
+    border-radius:8px;
+    padding:7px 10px;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+  }
+  .start-point-name::placeholder{color:#5A6067;}
+
+  /* ---------- Stop builder ---------- */
+  .stop-list{display:flex;flex-direction:column;gap:10px;}
+  .stop-card{
+    background:var(--ink-soft);
+    border:1px solid #262D34;
+    border-radius:var(--radius);
+    padding:14px;
+  }
+  .stop-card-top{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
+  .stop-index{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--text-on-dark-dim);
+    width:20px;
+    padding-top:9px;
+    flex-shrink:0;
+  }
+  .stop-name-input{
+    flex:1;
+    background:var(--ink);
+    border:1px solid #2A3138;
+    color:var(--text-on-dark);
+    border-radius:8px;
+    padding:8px 10px;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:600;
+  }
+  .stop-actions{display:flex;gap:4px;flex-shrink:0;}
+  .icon-btn{
+    width:30px;height:30px;
+    border-radius:7px;
+    border:1px solid #2A3138;
+    background:var(--ink);
+    color:var(--text-on-dark-dim);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;
+  }
+  .icon-btn:hover{color:var(--text-on-dark);border-color:#3A424A;}
+  .icon-btn.remove:hover{color:var(--danger);border-color:var(--danger);}
+
+  .stop-fields{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--text-on-dark-dim);
+  }
+  .mode-select{display:flex;gap:5px;}
+  .mode-btn{
+    flex:1;
+    padding:7px 0;
+    border-radius:7px;
+    border:1px solid #2A3138;
+    background:var(--ink);
+    color:var(--text-on-dark-dim);
+    cursor:pointer;
+    font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .mode-btn.active[data-mode="walk"]{background:var(--walk);border-color:var(--walk);color:#fff;}
+  .mode-btn.active[data-mode="drive"]{background:var(--drive);border-color:var(--drive);color:#fff;}
+  .mode-btn.active[data-mode="train"]{background:var(--train);border-color:var(--train);color:#fff;}
+  .mode-btn.active[data-mode="bus"]{background:var(--bus);border-color:var(--bus);color:#fff;}
+
+  .num-field{display:flex;align-items:center;gap:4px;}
+  .num-field input{
+    width:100%;
+    background:var(--ink);
+    border:1px solid #2A3138;
+    color:var(--text-on-dark);
+    border-radius:7px;
+    padding:7px 8px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+  }
+  .num-field span{font-size:12px;color:var(--text-on-dark-dim);flex-shrink:0;}
+
+  .add-stop-btn{
+    width:100%;
+    padding:12px;
+    border-radius:var(--radius);
+    border:1.5px dashed #333B43;
+    background:transparent;
+    color:var(--text-on-dark-dim);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+    margin-top:10px;
+  }
+  .add-stop-btn:hover{border-color:var(--accent-dim);color:var(--text-on-dark);}
+
+  .empty-hint{
+    color:var(--text-on-dark-dim);
+    font-size:13.5px;
+    text-align:center;
+    padding:26px 10px;
+    border:1.5px dashed #2A3138;
+    border-radius:var(--radius);
   }
 
-  /* ===== Trip header / stats ===== */
-  .trip-hero{padding:8px 4px 18px;}
-  .trip-hero h2{font-family:Georgia,serif; font-style:italic; font-weight:400; font-size:1.6rem; margin:2px 0 2px;}
-  .trip-hero .dates{color:var(--dim); font-size:.85rem;}
-  .trip-stats{display:flex; gap:18px; margin-top:12px; font-size:.78rem; color:var(--dim);}
-  .trip-stats b{color:var(--cream); font-size:1rem; display:block; font-family:ui-monospace,monospace;}
+  /* ---------- Timeline (signature element) ---------- */
+  .timeline{position:relative;padding-left:2px;}
+  .leg{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 0 8px 15px;
+    margin-left:15px;
+    border-left:3px solid var(--mode-color, var(--none));
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    color:var(--text-on-dark-dim);
+  }
+  .leg .leg-icon{
+    width:22px;height:22px;
+    border-radius:50%;
+    background:var(--mode-color, var(--none));
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;
+    flex-shrink:0;
+    margin-left:-27px;
+    border:3px solid var(--ink);
+  }
+  .leg .leg-text{color:var(--text-on-dark);font-weight:600;}
+  .leg .leg-time{color:var(--text-on-dark-dim);}
 
-  /* ===== Day tabs (boarding-stub strip) ===== */
-  .day-strip{
-    display:flex; gap:8px; overflow-x:auto; padding:4px 0 14px;
-    scrollbar-width:none;
+  .stop-ticket{
+    position:relative;
+    margin-left:15px;
+    background:var(--paper);
+    color:var(--text-on-paper);
+    border-radius:10px;
+    padding:14px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    border-left:3px solid var(--paper);
   }
-  .day-strip::-webkit-scrollbar{display:none;}
-  .day-tab{
-    flex:0 0 auto; background:var(--panel); border:1px solid #262c3a;
-    border-radius:8px; padding:8px 12px; text-align:left; cursor:pointer;
-    min-width:76px; position:relative;
+  .stop-ticket::before{
+    content:"";
+    position:absolute;
+    left:-3px;top:-3px;bottom:-3px;
+    width:3px;
+    background:repeating-linear-gradient(to bottom, var(--ink) 0 6px, transparent 6px 12px);
   }
-  .day-tab.active{border-color:var(--gold); background:#241f12;}
-  .day-tab .d-num{font-size:.68rem; color:var(--dim); text-transform:uppercase; letter-spacing:.06em;}
-  .day-tab .d-date{font-family:ui-monospace,monospace; font-size:.85rem; margin-top:2px;}
-  .day-tab .d-span{font-size:.65rem; color:var(--gold); margin-top:3px; font-family:ui-monospace,monospace;}
-  .day-add{
-    flex:0 0 auto; border:1px dashed var(--rail); border-radius:8px;
-    background:none; color:var(--dim); padding:8px 14px; cursor:pointer; min-width:44px;
+  .stop-ticket-main{min-width:0;}
+  .stop-ticket-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;margin:0 0 3px;}
+  .stop-ticket-dur{font-size:12px;color:var(--text-on-paper-dim);}
+  .stop-ticket-times{
+    font-family:'IBM Plex Mono',monospace;
+    text-align:right;
+    flex-shrink:0;
+    line-height:1.35;
   }
+  .stop-ticket-times .arr{font-size:16px;font-weight:600;}
+  .stop-ticket-times .dep{font-size:11px;color:var(--text-on-paper-dim);}
 
-  /* ===== Day panel ===== */
-  .day-panel{background:var(--panel); border-radius:var(--radius); padding:16px; border:1px solid #262c3a;}
-  .day-panel-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px;}
-  .day-panel-head input.day-label{
-    background:none;border:none;color:var(--cream); font-family:Georgia,serif; font-style:italic;
-    font-size:1.15rem; padding:0; width:100%;
+  .day-total{
+    margin-top:16px;
+    text-align:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    color:var(--text-on-dark-dim);
   }
-  .day-panel-head input.day-label:focus{outline:none; border-bottom:1px solid var(--gold);}
-  .day-del{background:none;border:none;color:var(--dim); font-size:1.1rem; cursor:pointer; padding:2px 6px;}
+  .day-total b{color:var(--text-on-dark);}
 
-  .day-bounds{
-    display:flex; justify-content:space-between; margin:10px 0 4px;
-    font-family:ui-monospace,monospace; font-size:.78rem; color:var(--dim);
-    letter-spacing:.04em; text-transform:uppercase;
+  .footer-actions{display:flex;gap:10px;margin-top:20px;}
+  .footer-actions button{
+    flex:1;
+    padding:11px;
+    border-radius:10px;
+    border:1px solid #2A3138;
+    background:transparent;
+    color:var(--text-on-dark-dim);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
   }
-  .day-bounds .b{color:var(--gold); font-size:.95rem;}
+  .footer-actions button:hover{color:var(--text-on-dark);border-color:#3A424A;}
 
-  /* ===== Timeline rail ===== */
-  .rail{position:relative; margin-top:14px; padding-left:26px;}
-  .rail::before{
-    content:''; position:absolute; left:9px; top:6px; bottom:6px; width:2px;
-    background:linear-gradient(var(--gold),var(--rail),var(--coral));
-    opacity:.5;
-  }
-  .activity{
-    position:relative; margin-bottom:14px; background:var(--panel-2);
-    border-radius:8px; padding:10px 12px 10px 14px; border:1px solid #262c3a;
-  }
-  .activity::before{
-    content:''; position:absolute; left:-22px; top:16px; width:10px; height:10px;
-    border-radius:50%; border:2px solid var(--bg);
-  }
-  .activity.sightseeing::before{background:var(--gold);}
-  .activity.transport::before{background:var(--teal);}
-  .activity.food::before{background:var(--coral);}
-  .activity.other::before{background:var(--lilac);}
-
-  .activity .top-row{display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
-  .activity .time{font-family:ui-monospace,monospace; font-size:.85rem; color:var(--gold); white-space:nowrap;}
-  .activity.transport .time{color:var(--teal);}
-  .activity.food .time{color:var(--coral);}
-  .activity.other .time{color:var(--lilac);}
-  .activity .title{font-size:1rem; font-weight:600; margin:2px 0;}
-  .activity .sub{font-size:.82rem; color:var(--dim); margin-bottom:2px;}
-  .activity .notes{font-size:.82rem; color:#c7c2b4; margin-top:4px; white-space:pre-wrap;}
-  .activity .tags{display:flex; gap:8px; margin-top:6px; font-size:.72rem; color:var(--dim); flex-wrap:wrap;}
-  .activity .tags span{border:1px solid var(--rail); border-radius:10px; padding:2px 8px;}
-  .activity .row-actions{display:flex; gap:6px; margin-top:8px;}
-  .activity .row-actions button{
-    background:none; border:1px solid var(--rail); color:var(--dim); border-radius:6px;
-    font-size:.72rem; padding:4px 8px; cursor:pointer;
-  }
-  .activity .row-actions button:active{border-color:var(--gold); color:var(--cream);}
-
-  .empty-day{text-align:center; color:var(--dim); padding:30px 10px; font-size:.88rem;}
-
-  .gap-marker{
-    position:relative; margin:-6px 0 14px; padding-left:2px;
-    font-size:.72rem; color:var(--dim); font-family:ui-monospace,monospace;
-    letter-spacing:.02em;
-  }
-  .gap-marker span{
-    background:var(--bg); padding:2px 8px 2px 0;
-  }
-  .gap-marker.gap-overlap{color:var(--coral);}
-
-  .add-activity-btn{
-    width:100%; margin-top:10px; padding:12px; border-radius:8px;
-    border:1px dashed var(--rail); background:none; color:var(--dim); cursor:pointer; font-size:.88rem;
-  }
-  .add-activity-btn:active{border-color:var(--gold); color:var(--gold);}
-
-  /* ===== Modal ===== */
-  .modal-backdrop{
-    position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:50;
-    display:flex; align-items:flex-end; justify-content:center;
-  }
-  .modal{
-    background:var(--panel); width:100%; max-width:640px; border-radius:16px 16px 0 0;
-    padding:18px 18px 26px; max-height:88vh; overflow-y:auto;
-    border-top:1px solid var(--rail);
-  }
-  .modal h3{margin:0 0 14px; font-family:Georgia,serif; font-style:italic; font-weight:400;}
-  .field{margin-bottom:12px;}
-  .field label{display:block; font-size:.75rem; color:var(--dim); text-transform:uppercase; letter-spacing:.05em; margin-bottom:5px;}
-  .field input, .field select, .field textarea{
-    width:100%; background:#14181f; border:1px solid var(--rail); color:var(--cream);
-    border-radius:8px; padding:10px 12px; font-size:.95rem; font-family:inherit;
-  }
-  .field textarea{resize:vertical; min-height:60px;}
-  .row2{display:flex; gap:10px;}
-  .row2 .field{flex:1;}
-  .type-picker{display:flex; gap:8px; flex-wrap:wrap;}
-  .type-picker button{
-    flex:1; min-width:70px; padding:9px 4px; border-radius:8px; border:1px solid var(--rail);
-    background:#14181f; color:var(--dim); font-size:.78rem; cursor:pointer;
-  }
-  .type-picker button.sel{border-color:var(--gold); color:var(--gold); background:#241f12;}
-  .modal-actions{display:flex; gap:10px; margin-top:16px;}
-  .modal-actions .btn-primary, .modal-actions .btn-ghost{flex:1; text-align:center;}
-
-  .sheet-close{
-    width:36px;height:4px;background:var(--rail);border-radius:2px;margin:0 auto 14px;
-  }
-
-  footer.hint{
-    text-align:center; color:#4a5164; font-size:.72rem; padding:20px 10px 0;
+  @media (max-width:420px){
+    h1{font-size:28px;}
+    .stop-fields{grid-template-columns:1fr 1fr;}
   }
 </style>
 </head>
 <body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Dayline · itinerary builder</p>
+    <h1>Plan the <span>route</span> of your day</h1>
+    <p class="sub">List your stops, pick how you'll get between them, and set one fixed time — Dayline lays out arrivals and departures for the rest.</p>
+  </header>
 
-<header class="app">
-  <div class="brand"><span class="mark"></span><h1>Waypoint</h1></div>
-  <button class="trip-switch" id="switchTripsBtn" style="display:none;">All trips</button>
-</header>
+  <section>
+    <p class="section-label">Anchor time</p>
+    <div class="time-card">
+      <div class="time-toggle">
+        <button id="btnStart" class="active" onclick="setAnchorMode('start')">Fix start time</button>
+        <button id="btnEnd" onclick="setAnchorMode('end')">Fix end time</button>
+      </div>
+      <div class="time-row">
+        <label id="anchorLabel">Leave</label>
+        <input type="time" id="anchorTime" value="09:00" oninput="render()">
+        <input type="text" class="start-point-name" id="startPointName" placeholder="From (e.g. hotel) — optional" oninput="render()">
+      </div>
+    </div>
+  </section>
 
-<main id="main"></main>
+  <section>
+    <p class="section-label">Stops</p>
+    <div class="stop-list" id="stopList"></div>
+    <button class="add-stop-btn" onclick="addStop()">+ Add a stop</button>
+  </section>
 
-<footer class="hint" id="hint"></footer>
+  <section id="timelineSection" style="display:none;">
+    <p class="section-label">Your day</p>
+    <div class="timeline" id="timeline"></div>
+    <div class="day-total" id="dayTotal"></div>
+  </section>
+
+  <div class="footer-actions">
+    <button onclick="clearAll()">Clear day</button>
+  </div>
+</div>
 
 <script>
-const LS_TRIPS = 'waypoint_trips_v1';
-const LS_CURRENT = 'waypoint_current_trip_v1';
+const MODES = {
+  walk:  {icon:'🚶', label:'Walk',  color:'var(--walk)'},
+  drive: {icon:'🚗', label:'Drive', color:'var(--drive)'},
+  train: {icon:'🚆', label:'Train', color:'var(--train)'},
+  bus:   {icon:'🚌', label:'Bus',   color:'var(--bus)'}
+};
 
-const memoryStore = {};
-let storageWarned = false;
-function safeGet(key){
-  try{ return localStorage.getItem(key); }
-  catch(e){ warnNoStorage(); return (key in memoryStore) ? memoryStore[key] : null; }
-}
-function safeSet(key, val){
-  try{ localStorage.setItem(key, val); }
-  catch(e){ warnNoStorage(); memoryStore[key] = val; }
-}
-function safeRemove(key){
-  try{ localStorage.removeItem(key); }
-  catch(e){ warnNoStorage(); delete memoryStore[key]; }
-}
-function warnNoStorage(){
-  if(storageWarned) return;
-  storageWarned = true;
-  setTimeout(()=>{
-    const hint = document.getElementById('hint');
-    if(hint) hint.textContent = 'Storage is restricted in this preview — your plan won\'t be saved after you leave. Open the file directly in a browser tab to save trips.';
-  },0);
-}
+let state = {
+  anchorMode: 'start', // 'start' or 'end'
+  anchorTime: '09:00',
+  startPointName: '',
+  stops: []
+};
 
-let trips = loadTrips();
-let currentTripId = safeGet(LS_CURRENT);
-let activeDayId = null;
+function uid(){ return Math.random().toString(36).slice(2,9); }
 
-function loadTrips(){
-  try{ return JSON.parse(safeGet(LS_TRIPS)) || []; }catch(e){ return []; }
-}
-function saveTrips(){
-  safeSet(LS_TRIPS, JSON.stringify(trips));
-}
-function uid(){ return Math.random().toString(36).slice(2,10); }
-function getTrip(id){ return trips.find(t=>t.id===id); }
-
-function fmtDate(iso){
-  if(!iso) return '';
-  const d = new Date(iso+'T00:00:00');
-  return d.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'});
-}
-function fmtDateFull(iso){
-  if(!iso) return '';
-  const d = new Date(iso+'T00:00:00');
-  return d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric', year:'numeric'});
-}
-function addDays(iso,n){
-  const d = new Date(iso+'T00:00:00');
-  d.setDate(d.getDate()+n);
-  return d.toISOString().slice(0,10);
-}
-function timeOptionsHtml(selected){
-  let html = `<option value="">No time set</option>`;
-  for(let h=0; h<24; h++){
-    for(let m=0; m<60; m+=15){
-      const val = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
-      html += `<option value="${val}" ${selected===val?'selected':''}>${val}</option>`;
+function loadState(){
+  try{
+    const saved = localStorage.getItem('dayline_v1');
+    if(saved){
+      const parsed = JSON.parse(saved);
+      state = Object.assign(state, parsed);
     }
+  }catch(e){}
+  if(state.stops.length === 0){
+    state.stops.push(newStop());
   }
-  return html;
 }
-function timeToMin(t){
-  if(!t) return null;
+
+function saveState(){
+  try{ localStorage.setItem('dayline_v1', JSON.stringify(state)); }catch(e){}
+}
+
+function newStop(){
+  return { id:uid(), name:'', duration:60, mode:'walk', travelTime:15 };
+}
+
+function addStop(){
+  state.stops.push(newStop());
+  render();
+}
+
+function removeStop(id){
+  state.stops = state.stops.filter(s => s.id !== id);
+  if(state.stops.length === 0) state.stops.push(newStop());
+  render();
+}
+
+function moveStop(id, dir){
+  const i = state.stops.findIndex(s => s.id === id);
+  const j = i + dir;
+  if(j < 0 || j >= state.stops.length) return;
+  [state.stops[i], state.stops[j]] = [state.stops[j], state.stops[i]];
+  render();
+}
+
+function updateStop(id, field, value){
+  const stop = state.stops.find(s => s.id === id);
+  if(stop) stop[field] = value;
+  saveState();
+  renderTimeline();
+}
+
+function setAnchorMode(mode){
+  state.anchorMode = mode;
+  document.getElementById('btnStart').classList.toggle('active', mode === 'start');
+  document.getElementById('btnEnd').classList.toggle('active', mode === 'end');
+  document.getElementById('anchorLabel').textContent = mode === 'start' ? 'Leave' : 'Be back by';
+  render();
+}
+
+function clearAll(){
+  if(!confirm('Clear the whole day plan?')) return;
+  state = { anchorMode:'start', anchorTime:'09:00', startPointName:'', stops:[newStop()] };
+  localStorage.removeItem('dayline_v1');
+  render();
+}
+
+function fmtTime(mins){
+  const overflow = Math.floor(mins / 1440);
+  const m = ((mins % 1440) + 1440) % 1440;
+  const h = Math.floor(m/60);
+  const mm = m % 60;
+  const ampm = h < 12 ? 'am' : 'pm';
+  let h12 = h % 12; if(h12 === 0) h12 = 12;
+  const label = `${h12}:${String(mm).padStart(2,'0')}${ampm}`;
+  return overflow !== 0 ? `${label} (${overflow > 0 ? '+' : ''}${overflow}d)` : label;
+}
+
+function fmtDuration(mins){
+  const h = Math.floor(mins/60), m = mins % 60;
+  if(h === 0) return `${m}m`;
+  if(m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
+function timeToMins(t){
   const [h,m] = t.split(':').map(Number);
   return h*60+m;
 }
-function minToLabel(mins){
-  if(mins===null || mins===undefined) return '—';
-  let h = Math.floor(mins/60), m = mins%60;
-  const dayOffset = Math.floor(h/24);
-  h = ((h%24)+24)%24;
-  const label = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
-  return dayOffset>0 ? label+' +'+dayOffset+'d' : label;
-}
 
-function effectiveEndMin(a){
-  if(a.end) return timeToMin(a.end);
-  if(a.start) return timeToMin(a.start);
-  return null;
-}
-function fmtDuration(mins){
-  const h = Math.floor(mins/60), m = mins%60;
-  if(h && m) return `${h}h ${m}m`;
-  if(h) return `${h}h`;
-  return `${m}m`;
-}
+function renderStopList(){
+  const container = document.getElementById('stopList');
+  container.innerHTML = '';
+  state.stops.forEach((stop, idx) => {
+    const card = document.createElement('div');
+    card.className = 'stop-card';
 
-function dayBounds(day){
-  let starts=[], ends=[];
-  day.activities.forEach(a=>{
-    if(a.start!==''&&a.start!=null) starts.push(timeToMin(a.start));
-    if(a.end!==''&&a.end!=null) ends.push(timeToMin(a.end));
-    else if(a.start) ends.push(timeToMin(a.start));
+    const isFirst = idx === 0;
+    card.innerHTML = `
+      <div class="stop-card-top">
+        <div class="stop-index">${idx+1}</div>
+        <input class="stop-name-input" placeholder="Place name" value="${escapeAttr(stop.name)}"
+          oninput="updateStop('${stop.id}','name',this.value)">
+        <div class="stop-actions">
+          <button class="icon-btn" title="Move up" onclick="moveStop('${stop.id}',-1)" ${idx===0?'disabled style=\"opacity:.3\"':''}>↑</button>
+          <button class="icon-btn" title="Move down" onclick="moveStop('${stop.id}',1)" ${idx===state.stops.length-1?'disabled style=\"opacity:.3\"':''}>↓</button>
+          <button class="icon-btn remove" title="Remove" onclick="removeStop('${stop.id}')">✕</button>
+        </div>
+      </div>
+      <div class="stop-fields">
+        <div class="field" style="grid-column:1/-1;">
+          <label>${isFirst ? 'Getting there from start' : 'Getting there from previous stop'}</label>
+          <div class="mode-select">
+            ${Object.keys(MODES).map(m => `
+              <button type="button" class="mode-btn ${stop.mode===m?'active':''}" data-mode="${m}"
+                onclick="updateStop('${stop.id}','mode','${m}'); render();">${MODES[m].icon}</button>
+            `).join('')}
+          </div>
+        </div>
+        <div class="field">
+          <label>Travel time</label>
+          <div class="num-field">
+            <input type="number" min="0" step="5" value="${stop.travelTime}"
+              oninput="updateStop('${stop.id}','travelTime', parseInt(this.value)||0)">
+            <span>min</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Time at stop</label>
+          <div class="num-field">
+            <input type="number" min="0" step="5" value="${stop.duration}"
+              oninput="updateStop('${stop.id}','duration', parseInt(this.value)||0)">
+            <span>min</span>
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
   });
-  if(!starts.length) return {start:null,end:null};
-  return {start:Math.min(...starts), end:Math.max(...ends)};
 }
 
-function tripStats(trip){
-  let totalCost=0, totalActs=0;
-  trip.days.forEach(d=>d.activities.forEach(a=>{
-    totalActs++;
-    const c = parseFloat(a.cost);
-    if(!isNaN(c)) totalCost+=c;
-  }));
-  return {days:trip.days.length, acts:totalActs, cost:totalCost};
+function escapeAttr(str){
+  return (str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 }
 
-const TYPES = [
-  {key:'sightseeing', label:'Sightseeing'},
-  {key:'transport', label:'Transport'},
-  {key:'food', label:'Food'},
-  {key:'other', label:'Other'},
-];
+function computeSchedule(){
+  const stops = state.stops.filter(s => s.name.trim() !== '');
+  if(stops.length === 0) return null;
 
-// ============ RENDER ============
-function render(){
-  const main = document.getElementById('main');
-  const switchBtn = document.getElementById('switchTripsBtn');
-  const hint = document.getElementById('hint');
-  const trip = getTrip(currentTripId);
+  const results = stops.map(s => ({...s, arrive:0, depart:0}));
 
-  if(!trip){
-    switchBtn.style.display='none';
-    hint.textContent='';
-    renderTripList(main);
+  if(state.anchorMode === 'start'){
+    let current = timeToMins(state.anchorTime);
+    const startDepart = current;
+    results.forEach(s => {
+      s.arrive = current + s.travelTime;
+      s.depart = s.arrive + s.duration;
+      current = s.depart;
+    });
+    return { results, startDepart, endArrive:null };
+  } else {
+    let current = timeToMins(state.anchorTime); // final depart from last stop
+    for(let i = results.length-1; i >= 0; i--){
+      results[i].depart = current;
+      results[i].arrive = results[i].depart - results[i].duration;
+      current = results[i].arrive - results[i].travelTime;
+    }
+    return { results, startDepart:current, endArrive:null };
+  }
+}
+
+function renderTimeline(){
+  const schedule = computeSchedule();
+  const section = document.getElementById('timelineSection');
+  const timeline = document.getElementById('timeline');
+  const totalEl = document.getElementById('dayTotal');
+
+  if(!schedule){
+    section.style.display = 'none';
     return;
   }
-  switchBtn.style.display='inline-block';
-  switchBtn.onclick = ()=>{ currentTripId=null; safeRemove(LS_CURRENT); render(); };
-  hint.textContent='Times shown are local to each day • data stays on this device';
-  renderTrip(main, trip);
-}
+  section.style.display = 'block';
+  timeline.innerHTML = '';
 
-function renderTripList(main){
-  main.innerHTML='';
-  const wrap = document.createElement('div');
-  wrap.style.paddingTop='16px';
+  const startLabel = state.startPointName.trim() || (state.anchorMode==='start' ? 'Start point' : 'Start point');
 
-  if(trips.length===0){
-    wrap.innerHTML = `
-      <div class="empty-state">
-        <div class="glyph">✈︎</div>
-        <div style="font-family:Georgia,serif;font-style:italic;font-size:1.2rem;color:var(--cream);margin-bottom:6px;">No trips yet</div>
-        <div>Plan a holiday day-by-day — sightseeing, transport, and everything in between.</div>
+  // first leg from start point
+  const firstMode = MODES[schedule.results[0].mode];
+  const leg0 = document.createElement('div');
+  leg0.className = 'leg';
+  leg0.style.setProperty('--mode-color', firstMode.color);
+  leg0.innerHTML = `<div class="leg-icon">${firstMode.icon}</div>
+    <span class="leg-text">Depart ${fmtTime(schedule.startDepart)}</span>
+    <span class="leg-time">${startLabel} · ${fmtDuration(schedule.results[0].travelTime)} ${firstMode.label.toLowerCase()}</span>`;
+  timeline.appendChild(leg0);
+
+  schedule.results.forEach((s, idx) => {
+    const ticket = document.createElement('div');
+    ticket.className = 'stop-ticket';
+    ticket.innerHTML = `
+      <div class="stop-ticket-main">
+        <p class="stop-ticket-name">${escapeHtml(s.name)}</p>
+        <p class="stop-ticket-dur">${fmtDuration(s.duration)} here</p>
+      </div>
+      <div class="stop-ticket-times">
+        <div class="arr">${fmtTime(s.arrive)}</div>
+        <div class="dep">until ${fmtTime(s.depart)}</div>
       </div>`;
-  } else {
-    trips.slice().reverse().forEach(t=>{
-      const stats = tripStats(t);
-      const card = document.createElement('div');
-      card.className='trip-card';
-      card.innerHTML = `<h3>${escapeHtml(t.name)}</h3>
-        <div class="meta">${t.days.length} day${t.days.length!==1?'s':''} ${t.startDate?'· starts '+fmtDate(t.startDate):''} ${stats.acts?'· '+stats.acts+' activities':''}</div>`;
-      card.onclick = ()=>{ currentTripId=t.id; safeSet(LS_CURRENT,t.id); activeDayId = t.days[0]?.id||null; render(); };
-      wrap.appendChild(card);
-    });
-  }
-  const newBtn = document.createElement('button');
-  newBtn.className='fab-new';
-  newBtn.textContent='+ Plan a new trip';
-  newBtn.onclick = ()=> openNewTripModal();
-  wrap.appendChild(newBtn);
-  main.appendChild(wrap);
-}
+    timeline.appendChild(ticket);
 
-function renderTrip(main, trip){
-  main.innerHTML='';
-
-  // Hero
-  const hero = document.createElement('div');
-  hero.className='trip-hero';
-  const stats = tripStats(trip);
-  hero.innerHTML = `
-    <h2>${escapeHtml(trip.name)}</h2>
-    <div class="dates">${trip.startDate ? fmtDateFull(trip.startDate) : 'No start date set'}${trip.days.length>1 ? ' → '+fmtDateFull(trip.days[trip.days.length-1].date||'') : ''}</div>
-    <div class="trip-stats">
-      <div><b>${stats.days}</b>days</div>
-      <div><b>${stats.acts}</b>activities</div>
-      <div><b>${stats.cost? '$'+stats.cost.toFixed(0) : '—'}</b>est. cost</div>
-    </div>`;
-  main.appendChild(hero);
-
-  // Day strip
-  if(!activeDayId || !trip.days.find(d=>d.id===activeDayId)){
-    activeDayId = trip.days[0]?.id || null;
-  }
-  const strip = document.createElement('div');
-  strip.className='day-strip';
-  trip.days.forEach((d,i)=>{
-    const b = dayBounds(d);
-    const tab = document.createElement('button');
-    tab.className='day-tab'+(d.id===activeDayId?' active':'');
-    tab.innerHTML = `<div class="d-num">Day ${i+1}</div>
-      <div class="d-date mono">${d.date?fmtDate(d.date):'no date'}</div>
-      <div class="d-span mono">${b.start!==null? minToLabel(b.start)+'–'+minToLabel(b.end) : '—'}</div>`;
-    tab.onclick = ()=>{ activeDayId=d.id; render(); };
-    strip.appendChild(tab);
+    if(idx < schedule.results.length - 1){
+      const next = schedule.results[idx+1];
+      const mode = MODES[next.mode];
+      const leg = document.createElement('div');
+      leg.className = 'leg';
+      leg.style.setProperty('--mode-color', mode.color);
+      leg.innerHTML = `<div class="leg-icon">${mode.icon}</div>
+        <span class="leg-text">${fmtDuration(next.travelTime)} ${mode.label.toLowerCase()}</span>
+        <span class="leg-time">to ${escapeHtml(next.name)}</span>`;
+      timeline.appendChild(leg);
+    }
   });
-  const addDayBtn = document.createElement('button');
-  addDayBtn.className='day-add';
-  addDayBtn.textContent='+';
-  addDayBtn.onclick = ()=>{
-    const lastDate = trip.days.length ? trip.days[trip.days.length-1].date : trip.startDate;
-    const newDay = {id:uid(), date: lastDate? addDays(lastDate,1) : '', label:'New day', activities:[]};
-    trip.days.push(newDay);
-    activeDayId = newDay.id;
-    saveTrips(); render();
-  };
-  strip.appendChild(addDayBtn);
-  main.appendChild(strip);
 
-  // Day panel
-  const day = trip.days.find(d=>d.id===activeDayId);
-  if(day){
-    main.appendChild(renderDayPanel(trip, day));
-  } else {
-    const empty = document.createElement('div');
-    empty.className='empty-state';
-    empty.textContent='Add a day to start planning.';
-    main.appendChild(empty);
-  }
+  const last = schedule.results[schedule.results.length-1];
+  const totalMins = last.depart - schedule.startDepart;
+  totalEl.innerHTML = `Out for <b>${fmtDuration(totalMins)}</b> · leave ${fmtTime(schedule.startDepart)} → back ${fmtTime(last.depart)}`;
 }
 
-function renderDayPanel(trip, day){
-  const panel = document.createElement('div');
-  panel.className='day-panel';
-
-  const head = document.createElement('div');
-  head.className='day-panel-head';
-  head.innerHTML = `<div style="flex:1;">
-      <input class="day-label" value="${escapeAttr(day.label||'')}" placeholder="Day title (e.g. Rome — Old Town)">
-      <div style="font-size:.75rem;color:var(--dim);margin-top:4px;">
-        <input type="date" value="${day.date||''}" style="background:none;border:none;color:var(--dim);font-family:ui-monospace,monospace;font-size:.78rem;padding:0;">
-      </div>
-    </div>
-    <button class="day-del" title="Delete day">🗑</button>`;
-  head.querySelector('.day-label').oninput = (e)=>{ day.label=e.target.value; saveTrips(); };
-  head.querySelector('input[type=date]').onchange = (e)=>{ day.date=e.target.value; saveTrips(); render(); };
-  head.querySelector('.day-del').onclick = ()=>{
-    if(confirm('Delete this day and its activities?')){
-      trip.days = trip.days.filter(d=>d.id!==day.id);
-      activeDayId = trip.days[0]?.id || null;
-      saveTrips(); render();
-    }
-  };
-  panel.appendChild(head);
-
-  const b = dayBounds(day);
-  const bounds = document.createElement('div');
-  bounds.className='day-bounds';
-  bounds.innerHTML = `<div>Start <span class="b">${minToLabel(b.start)}</span></div><div>End <span class="b">${minToLabel(b.end)}</span></div>`;
-  panel.appendChild(bounds);
-
-  const rail = document.createElement('div');
-  rail.className='rail';
-  if(day.activities.length===0){
-    rail.innerHTML = `<div class="empty-day">No activities yet — add sightseeing, transport, food, or anything else.</div>`;
-  } else {
-    const sorted = day.activities.slice().sort((a,b)=>{
-      const ta = timeToMin(a.start), tb = timeToMin(b.start);
-      if(ta===null && tb===null) return 0;
-      if(ta===null) return 1;
-      if(tb===null) return -1;
-      return ta-tb;
-    });
-    sorted.forEach((a,idx)=>{
-      rail.appendChild(renderActivity(trip, day, a, idx, sorted.length));
-      if(idx < sorted.length-1){
-        const gapEl = renderGapMarker(a, sorted[idx+1]);
-        if(gapEl) rail.appendChild(gapEl);
-      }
-    });
-  }
-  panel.appendChild(rail);
-
-  const addBtn = document.createElement('button');
-  addBtn.className='add-activity-btn';
-  addBtn.textContent='+ Add activity';
-  addBtn.onclick = ()=> openActivityModal(trip, day, null);
-  panel.appendChild(addBtn);
-
-  return panel;
+function escapeHtml(str){
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function renderGapMarker(prev, next){
-  const prevEnd = effectiveEndMin(prev);
-  const nextStart = timeToMin(next.start);
-  if(prevEnd===null || nextStart===null) return null;
-  const diff = nextStart - prevEnd;
-  if(diff===0) return null;
-  const el = document.createElement('div');
-  if(diff > 0){
-    el.className = 'gap-marker';
-    el.innerHTML = `<span>${fmtDuration(diff)} free</span>`;
-  } else {
-    el.className = 'gap-marker gap-overlap';
-    el.innerHTML = `<span>⚠ overlaps by ${fmtDuration(-diff)}</span>`;
-  }
-  return el;
+function render(){
+  saveState();
+  document.getElementById('anchorTime').value = state.anchorTime;
+  document.getElementById('startPointName').value = state.startPointName;
+  renderStopList();
+  renderTimeline();
 }
 
-function typeLabel(k){ return (TYPES.find(t=>t.key===k)||{}).label || 'Other'; }
+document.getElementById('anchorTime').addEventListener('input', e => { state.anchorTime = e.target.value; render(); });
 
-function renderActivity(trip, day, a, idx, total){
-  const el = document.createElement('div');
-  el.className = 'activity '+(a.type||'other');
-  const timeStr = a.start ? (a.end && a.end!==a.start ? a.start+' – '+a.end : a.start) : 'no time set';
-  let sub = '';
-  if(a.type==='transport' && (a.from || a.to)){
-    sub = `${escapeHtml(a.from||'?')} → ${escapeHtml(a.to||'?')}`;
-    if(a.distance) sub += ` · ${escapeHtml(a.distance)}`;
-  } else if(a.location){
-    sub = escapeHtml(a.location);
-  }
-  el.innerHTML = `
-    <div class="top-row">
-      <div class="time mono">${timeStr}</div>
-    </div>
-    <div class="title">${escapeHtml(a.title||'Untitled')}</div>
-    ${sub ? `<div class="sub">${sub}</div>` : ''}
-    ${a.notes ? `<div class="notes">${escapeHtml(a.notes)}</div>` : ''}
-    <div class="tags">
-      <span>${typeLabel(a.type)}</span>
-      ${a.mode ? `<span>${escapeHtml(a.mode)}</span>` : ''}
-      ${a.cost ? `<span>$${escapeHtml(String(a.cost))}</span>` : ''}
-    </div>
-    <div class="row-actions">
-      <button data-act="up" ${idx===0?'disabled':''}>↑</button>
-      <button data-act="down" ${idx===total-1?'disabled':''}>↓</button>
-      <button data-act="edit">Edit</button>
-      <button data-act="del">Delete</button>
-    </div>`;
-  el.querySelector('[data-act=edit]').onclick = ()=> openActivityModal(trip, day, a);
-  el.querySelector('[data-act=del]').onclick = ()=>{
-    if(confirm('Delete this activity?')){
-      day.activities = day.activities.filter(x=>x.id!==a.id);
-      saveTrips(); render();
-    }
-  };
-  el.querySelector('[data-act=up]').onclick = ()=> nudgeManualOrder(day, a, -1);
-  el.querySelector('[data-act=down]').onclick = ()=> nudgeManualOrder(day, a, 1);
-  return el;
-}
-
-// Since activities auto-sort by time, up/down nudges the time slightly to reorder
-// relative to neighbors when times are equal/blank — keeps behavior predictable.
-function nudgeManualOrder(day, a, dir){
-  const sorted = day.activities.slice().sort((x,y)=>{
-    const tx=timeToMin(x.start), ty=timeToMin(y.start);
-    if(tx===null&&ty===null) return 0;
-    if(tx===null) return 1;
-    if(ty===null) return -1;
-    return tx-ty;
-  });
-  const i = sorted.findIndex(x=>x.id===a.id);
-  const j = i+dir;
-  if(j<0||j>=sorted.length) return;
-  const neighbor = sorted[j];
-  // swap start/end times to swap positions
-  const tmpS=a.start, tmpE=a.end;
-  a.start=neighbor.start; a.end=neighbor.end;
-  neighbor.start=tmpS; neighbor.end=tmpE;
-  saveTrips(); render();
-}
-
-function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function escapeAttr(s){ return escapeHtml(s); }
-
-// ============ MODALS ============
-function closeModal(){
-  const b = document.querySelector('.modal-backdrop');
-  if(b) b.remove();
-}
-
-function openNewTripModal(){
-  const backdrop = document.createElement('div');
-  backdrop.className='modal-backdrop';
-  backdrop.innerHTML = `
-    <div class="modal">
-      <div class="sheet-close"></div>
-      <h3>New trip</h3>
-      <div class="field"><label>Trip name</label><input id="ntName" placeholder="e.g. Japan, Spring 2027"></div>
-      <div class="field"><label>Start date</label><input id="ntDate" type="date"></div>
-      <div class="field"><label>Number of days</label><input id="ntDays" type="number" min="1" value="5"></div>
-      <div class="modal-actions">
-        <button class="btn-ghost" id="ntCancel">Cancel</button>
-        <button class="btn-primary" id="ntSave">Create trip</button>
-      </div>
-    </div>`;
-  document.body.appendChild(backdrop);
-  backdrop.onclick = (e)=>{ if(e.target===backdrop) closeModal(); };
-  backdrop.querySelector('#ntCancel').onclick = closeModal;
-  backdrop.querySelector('#ntSave').onclick = ()=>{
-    const name = backdrop.querySelector('#ntName').value.trim() || 'Untitled trip';
-    const date = backdrop.querySelector('#ntDate').value;
-    const numDays = Math.max(1, parseInt(backdrop.querySelector('#ntDays').value)||1);
-    const days=[];
-    for(let i=0;i<numDays;i++){
-      days.push({id:uid(), date: date? addDays(date,i) : '', label: 'Day '+(i+1), activities:[]});
-    }
-    const trip = {id:uid(), name, startDate:date, days};
-    trips.push(trip);
-    currentTripId = trip.id;
-    activeDayId = days[0].id;
-    safeSet(LS_CURRENT, trip.id);
-    saveTrips();
-    closeModal();
-    render();
-  };
-}
-
-function openActivityModal(trip, day, activity){
-  const isEdit = !!activity;
-  const a = activity || {id:uid(), type:'sightseeing', title:'', location:'', start:'', end:'', notes:'', cost:'', mode:'', from:'', to:'', distance:''};
-
-  if(!isEdit){
-    const withStart = day.activities.filter(x=>x.start);
-    if(withStart.length){
-      const sortedAsc = withStart.slice().sort((x,y)=>timeToMin(x.start)-timeToMin(y.start));
-      const last = sortedAsc[sortedAsc.length-1];
-      a.start = last.end || last.start;
-    }
-  }
-  const displayEnd = a.end || a.start || '';
-
-  const TRANSPORT_MODES = ['Drive','Flight','Train','Bus','Ferry','Metro/Subway','Walk','Taxi/Rideshare','Other'];
-
-  const backdrop = document.createElement('div');
-  backdrop.className='modal-backdrop';
-  backdrop.innerHTML = `
-    <div class="modal">
-      <div class="sheet-close"></div>
-      <h3>${isEdit? 'Edit activity':'Add activity'}</h3>
-      <div class="field">
-        <label>Type</label>
-        <div class="type-picker" id="typePicker">
-          ${TYPES.map(t=>`<button data-t="${t.key}" class="${a.type===t.key?'sel':''}">${t.label}</button>`).join('')}
-        </div>
-      </div>
-      <div class="field"><label>Title</label><input id="aTitle" value="${escapeAttr(a.title)}" placeholder="e.g. Colosseum tour"></div>
-      <div id="transportFields" style="display:none;">
-        <div class="field"><label>Mode</label>
-          <select id="aModeSel">${TRANSPORT_MODES.map(m=>`<option value="${m}" ${a.mode===m?'selected':''}>${m}</option>`).join('')}</select>
-        </div>
-        <div class="row2">
-          <div class="field"><label>From</label><input id="aFrom" value="${escapeAttr(a.from||'')}" placeholder="Departure"></div>
-          <div class="field"><label>To</label><input id="aTo" value="${escapeAttr(a.to||'')}" placeholder="Destination"></div>
-        </div>
-        <div class="field" id="distanceField" style="display:none;">
-          <label>Distance</label>
-          <input id="aDistance" value="${escapeAttr(a.distance||'')}" placeholder="e.g. 180 km">
-        </div>
-      </div>
-      <div class="field" id="locField"><label>Location</label><input id="aLoc" value="${escapeAttr(a.location||'')}" placeholder="Where"></div>
-      <div class="field" id="modeFreeField"><label>Detail</label><input id="aMode" value="${escapeAttr(a.mode||'')}" placeholder="e.g. self-guided, booked tour"></div>
-      <div class="row2">
-        <div class="field"><label>Start time</label><select id="aStart">${timeOptionsHtml(a.start||'')}</select></div>
-        <div class="field"><label>End time</label><select id="aEnd">${timeOptionsHtml(displayEnd)}</select></div>
-      </div>
-      <div class="field"><label>Estimated cost</label><input id="aCost" type="number" step="0.01" value="${escapeAttr(a.cost||'')}" placeholder="0.00"></div>
-      <div class="field"><label>Notes</label><textarea id="aNotes" placeholder="Booking refs, tips, reminders...">${escapeHtml(a.notes||'')}</textarea></div>
-      <div class="modal-actions">
-        <button class="btn-ghost" id="aCancel">Cancel</button>
-        <button class="btn-primary" id="aSave">${isEdit?'Save changes':'Add activity'}</button>
-      </div>
-    </div>`;
-  document.body.appendChild(backdrop);
-
-  function syncDistanceUI(){
-    const modeSel = backdrop.querySelector('#aModeSel');
-    const isDrive = modeSel && modeSel.value === 'Drive';
-    backdrop.querySelector('#distanceField').style.display = isDrive ? 'block' : 'none';
-  }
-  function syncTypeUI(type){
-    backdrop.querySelectorAll('#typePicker button').forEach(b=>b.classList.toggle('sel', b.dataset.t===type));
-    const isTransport = type==='transport';
-    backdrop.querySelector('#transportFields').style.display = isTransport ? 'block' : 'none';
-    backdrop.querySelector('#locField').style.display = isTransport ? 'none' : 'block';
-    backdrop.querySelector('#modeFreeField').style.display = isTransport ? 'none' : 'block';
-    if(isTransport) syncDistanceUI();
-  }
-  syncTypeUI(a.type);
-  let selectedType = a.type;
-  backdrop.querySelectorAll('#typePicker button').forEach(b=>{
-    b.onclick = ()=>{ selectedType=b.dataset.t; syncTypeUI(selectedType); };
-  });
-  const modeSelEl = backdrop.querySelector('#aModeSel');
-  if(modeSelEl) modeSelEl.onchange = syncDistanceUI;
-
-  backdrop.onclick = (e)=>{ if(e.target===backdrop) closeModal(); };
-  backdrop.querySelector('#aCancel').onclick = closeModal;
-  backdrop.querySelector('#aSave').onclick = ()=>{
-    a.type = selectedType;
-    a.title = backdrop.querySelector('#aTitle').value.trim();
-    a.location = backdrop.querySelector('#aLoc').value.trim();
-    a.from = backdrop.querySelector('#aFrom').value.trim();
-    a.to = backdrop.querySelector('#aTo').value.trim();
-    if(selectedType==='transport'){
-      a.mode = backdrop.querySelector('#aModeSel').value;
-      a.distance = a.mode==='Drive' ? backdrop.querySelector('#aDistance').value.trim() : '';
-    } else {
-      a.mode = backdrop.querySelector('#aMode').value.trim();
-      a.distance = '';
-    }
-    a.start = backdrop.querySelector('#aStart').value;
-    a.end = backdrop.querySelector('#aEnd').value;
-    a.cost = backdrop.querySelector('#aCost').value;
-    a.notes = backdrop.querySelector('#aNotes').value.trim();
-    if(!a.title) a.title = typeLabel(a.type);
-    if(!isEdit) day.activities.push(a);
-    saveTrips();
-    closeModal();
-    render();
-  };
-}
-
-window.addEventListener('error', function(e){
-  const main = document.getElementById('main');
-  if(main) main.innerHTML = `<div style="padding:30px 16px;color:#e2725b;font-family:ui-monospace,monospace;font-size:.85rem;white-space:pre-wrap;">
-    Something failed while loading Waypoint:
-${(e.error && e.error.message) || e.message || 'Unknown error'}
-
-If you're viewing this inside a chat preview, try downloading the file and opening it directly in a browser tab instead.</div>`;
-});
-
-try{
-  render();
-}catch(err){
-  const main = document.getElementById('main');
-  if(main) main.innerHTML = `<div style="padding:30px 16px;color:#e2725b;font-family:ui-monospace,monospace;font-size:.85rem;white-space:pre-wrap;">
-    Something failed while loading Waypoint:
-${err.message}
-
-If you're viewing this inside a chat preview, try downloading the file and opening it directly in a browser tab instead.</div>`;
-}
+loadState();
+setAnchorMode(state.anchorMode);
+render();
 </script>
 </body>
 </html>
