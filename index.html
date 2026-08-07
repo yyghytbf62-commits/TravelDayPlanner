@@ -336,8 +336,8 @@
       </div>
       <div class="time-row">
         <label id="anchorLabel">Leave</label>
-        <input type="time" id="anchorTime" value="09:00" oninput="render()">
-        <input type="text" class="start-point-name" id="startPointName" placeholder="From (e.g. hotel) — optional" oninput="render()">
+        <input type="time" id="anchorTime" value="09:00" oninput="onAnchorTimeInput(this.value)">
+        <input type="text" class="start-point-name" id="startPointName" placeholder="From (e.g. hotel) — optional" oninput="onStartPointInput(this.value)">
       </div>
     </div>
   </section>
@@ -611,7 +611,18 @@ function render(){
   renderTimeline();
 }
 
-document.getElementById('anchorTime').addEventListener('input', e => { state.anchorTime = e.target.value; render(); });
+// These two inputs update state + the timeline directly, without
+// rewriting their own .value mid-keystroke (which was clobbering input).
+function onAnchorTimeInput(value){
+  state.anchorTime = value;
+  saveState();
+  renderTimeline();
+}
+function onStartPointInput(value){
+  state.startPointName = value;
+  saveState();
+  renderTimeline();
+}
 
 loadState();
 setAnchorMode(state.anchorMode);
