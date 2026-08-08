@@ -23,6 +23,10 @@
     --train:#3F7D5C;
     --bus:#8B4F8C;
     --none:#8A8377;
+    --tag:#C99B2E;
+    --tag-text:#E8C871;
+    --tag-paper-bg:#F3E4BC;
+    --tag-paper-text:#8A6318;
     --danger:#B4432F;
     --radius:14px;
   }
@@ -194,6 +198,25 @@
   .mode-btn.active[data-mode="train"]{background:var(--train);border-color:var(--train);color:#fff;}
   .mode-btn.active[data-mode="bus"]{background:var(--bus);border-color:var(--bus);color:#fff;}
 
+  .category-select{display:flex;flex-wrap:wrap;gap:6px;}
+  .category-btn{
+    padding:6px 11px;
+    border-radius:999px;
+    border:1px solid #2A3138;
+    background:var(--ink);
+    color:var(--text-on-dark-dim);
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .category-btn.active{
+    background:rgba(201,155,46,.16);
+    border-color:var(--tag);
+    color:var(--tag-text);
+  }
+
   .num-field{display:flex;align-items:center;gap:4px;}
   .num-field input{
     width:100%;
@@ -280,6 +303,16 @@
   .stop-ticket-main{min-width:0;}
   .stop-ticket-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;margin:0 0 3px;}
   .stop-ticket-dur{font-size:12px;color:var(--text-on-paper-dim);}
+  .stop-tag{
+    display:inline-block;
+    background:var(--tag-paper-bg);
+    color:var(--tag-paper-text);
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:600;
+    margin-left:2px;
+  }
   .stop-ticket-times{
     font-family:'IBM Plex Mono',monospace;
     text-align:right;
@@ -367,6 +400,13 @@ const MODES = {
   bus:   {icon:'🚌', label:'Bus',   color:'var(--bus)'}
 };
 
+const CATEGORIES = {
+  breakfast: {icon:'🍳', label:'Breakfast'},
+  coffee: {icon:'☕', label:'Coffee'},
+  lunch: {icon:'🍽️', label:'Lunch'},
+  'afternoon-tea': {icon:'🫖', label:'Afternoon tea'}
+};
+
 let state = {
   anchorMode: 'start', // 'start' or 'end'
   anchorTime: '09:00',
@@ -394,7 +434,14 @@ function saveState(){
 }
 
 function newStop(){
-  return { id:uid(), name:'', duration:60, mode:'walk', travelTime:15 };
+  return { id:uid(), name:'', duration:60, mode:'walk', travelTime:15, category:'none' };
+}
+
+function toggleCategory(id, cat){
+  const stop = state.stops.find(s => s.id === id);
+  if(!stop) return;
+  stop.category = (stop.category === cat) ? 'none' : cat;
+  render();
 }
 
 function addStop(){
@@ -506,6 +553,15 @@ function renderStopList(){
             <span>min</span>
           </div>
         </div>
+        <div class="field" style="grid-column:1/-1;">
+          <label>Tag (optional)</label>
+          <div class="category-select">
+            ${Object.keys(CATEGORIES).map(c => `
+              <button type="button" class="category-btn ${stop.category===c?'active':''}"
+                onclick="toggleCategory('${stop.id}','${c}')">${CATEGORIES[c].icon} ${CATEGORIES[c].label}</button>
+            `).join('')}
+          </div>
+        </div>
       </div>
     `;
     container.appendChild(card);
@@ -570,10 +626,11 @@ function renderTimeline(){
   schedule.results.forEach((s, idx) => {
     const ticket = document.createElement('div');
     ticket.className = 'stop-ticket';
+    const cat = CATEGORIES[s.category];
     ticket.innerHTML = `
       <div class="stop-ticket-main">
         <p class="stop-ticket-name">${escapeHtml(s.name)}</p>
-        <p class="stop-ticket-dur">${fmtDuration(s.duration)} here</p>
+        <p class="stop-ticket-dur">${fmtDuration(s.duration)} here${cat ? ` <span class="stop-tag">${cat.icon} ${cat.label}</span>` : ''}</p>
       </div>
       <div class="stop-ticket-times">
         <div class="arr">${fmtTime(s.arrive)}</div>
