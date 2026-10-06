@@ -217,6 +217,18 @@
     color:var(--tag-text);
   }
 
+  .notes-input{
+    width:100%;
+    background:var(--ink);
+    border:1px solid #2A3138;
+    color:var(--text-on-dark);
+    border-radius:7px;
+    padding:7px 9px;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+  }
+  .notes-input::placeholder{color:#5A6067;}
+
   .num-field{display:flex;align-items:center;gap:4px;}
   .num-field input{
     width:100%;
@@ -312,6 +324,13 @@
     font-size:11px;
     font-weight:600;
     margin-left:2px;
+  }
+  .stop-ticket-notes{
+    margin:5px 0 0;
+    font-size:12px;
+    color:var(--text-on-paper-dim);
+    font-style:italic;
+    line-height:1.4;
   }
   .stop-ticket-times{
     font-family:'IBM Plex Mono',monospace;
@@ -434,7 +453,7 @@ function saveState(){
 }
 
 function newStop(){
-  return { id:uid(), name:'', duration:60, mode:'walk', travelTime:15, category:'none' };
+  return { id:uid(), name:'', duration:60, mode:'walk', travelTime:15, category:'none', notes:'' };
 }
 
 function toggleCategory(id, cat){
@@ -562,6 +581,11 @@ function renderStopList(){
             `).join('')}
           </div>
         </div>
+        <div class="field" style="grid-column:1/-1;">
+          <label>Notes (optional)</label>
+          <input type="text" class="notes-input" placeholder="Booking ref, what to order, which entrance…"
+            value="${escapeAttr(stop.notes)}" oninput="updateStop('${stop.id}','notes',this.value)">
+        </div>
       </div>
     `;
     container.appendChild(card);
@@ -631,6 +655,7 @@ function renderTimeline(){
       <div class="stop-ticket-main">
         <p class="stop-ticket-name">${escapeHtml(s.name)}</p>
         <p class="stop-ticket-dur">${fmtDuration(s.duration)} here${cat ? ` <span class="stop-tag">${cat.icon} ${cat.label}</span>` : ''}</p>
+        ${s.notes && s.notes.trim() ? `<p class="stop-ticket-notes">${escapeHtml(s.notes)}</p>` : ''}
       </div>
       <div class="stop-ticket-times">
         <div class="arr">${fmtTime(s.arrive)}</div>
